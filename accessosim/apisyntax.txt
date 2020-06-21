@@ -12,7 +12,7 @@ thing: id of the related thing a 4 character unique string for each restroom
 sensor: value of sensor 0=OFF, 1=ON
 Response: see single thing response
 
-simupdsens
+simupdstat
 Update a restroom status request: applies to a single thing and updates related status; returns the  global status of the thing.
 Request: http://<hostname>/accessosim/simupdstat.php?thing=id&status=value
 thing: id of the related thing a 4 character unique string for each restroom
