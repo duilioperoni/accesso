@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maintenance App Simulator</title>
+<script type='text/javascript' src='../js/jquery/jquery.js?ver=1.12.4-wp'></script>
+<script type='text/javascript' src='../js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<link href="../css/site.css" rel="stylesheet">
+<link href="../css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+<div id="main">
+<h1 class="intest">AppSan Maintenance App Simulator</h1>
+<hr>
+<h5>RESTROOM #1<span class="rrtype" id="tyid1">UNKNOWN</span><span class="unk" id="rrsta1">UNKNOWN</span><input class="resbtn" disabled type="button" id="mbtn1" value="MAINT" onclick="maint('B001')"  ><input class="resbtn" disabled type="button" id="fbtn1" value="FREE" onclick="free('B001')"  >
+<hr>
+<div class="restroom">
+<h5>RESTROOM #2<span class="rrtype" id="tyid2">UNKNOWN</span><span class="unk" id="rrsta2">UNKNOWN</span><input class="resbtn" disabled type="button" id="mbtn2" value="MAINT" onclick="maint('B002')"  ><input class="resbtn" disabled type="button" id="fbtn2" value="FREE" onclick="free('B002')"  >
+</div>
+<hr>
+<div class="restroom">
+<h5>RESTROOM #3<span class="rrtype" id="tyid3">UNKNOWN</span><span class="unk" id="rrsta3">UNKNOWN</span><input class="resbtn" disabled type="button" id="mbtn3" value="MAINT" onclick="maint('B003')"  ><input class="resbtn" disabled type="button" id="fbtn3" value="FREE" onclick="free('B003')"  >
+</div>
+<hr>
+<div class="restroom">
+<h5>RESTROOM #4<span class="rrtype" id="tyid4">UNKNOWN</span><span class="unk" id="rrsta4">UNKNOWN</span><input class="resbtn" disabled type="button" id="mbtn4" value="MAINT" onclick="maint('B004')"  ><input class="resbtn" disabled type="button" id="fbtn4" value="FREE" onclick="free('B004')"  >
+</div>
+<hr>
+<h5 ><i>REQUEST:</i><span id="rq">?</span></h5>
+<h5><i>RESPONSE:</i><span id="rs">?</span></h5>
+<hr>
+<div id="contenitore"><p class="doc">This web page simulates Maintenance App AppSan.<br>
+It shows the status of the restrooms of the school and put in maintenance or free from maintenance restrooms.<br>
+</p></div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+//main
+//set up timers
+var interval = setInterval(getall, 500);
+gettype();
+//functions
+//periodically update info of eache restroom
+function getall() {
+	//build request URL
+	var req="../api/simgetall.php";
+	//local diagnostic of request URL
+	//jQuery('#rq').html(req);
+	//update local diagnostic of status
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					//jQuery('#rs').html(data);
+					var things = jQuery.parseJSON( data ).data;
+					var i=1;
+					var msg="";
+					var sta;
+					things.forEach(function(t){
+						sta=t.status;
+						if(sta==0){
+							msg="VACANT"
+							jQuery('#rrsta'+i).removeClass().addClass('vac');
+							jQuery('#mbtn'+i).removeAttr('disabled');
+							jQuery('#fbtn'+i).attr('disabled', 'true');
+							
+						}
+						else if (sta==1){
+							msg="ENGAGED"
+							jQuery('#rrsta'+i).removeClass().addClass('eng');
+							jQuery('#mbtn'+i).removeAttr('disabled');
+							jQuery('#fbtn'+i).attr('disabled', 'true');
+						}
+						else if (sta==2){
+							msg="RESERVED";
+							jQuery('#rrsta'+i).removeClass().addClass('res');
+							jQuery('#mbtn'+i).removeAttr('disabled');
+							jQuery('#fbtn'+i).attr('disabled', 'true');
+						}
+						else if (sta==3){
+							msg="MAINTENANCE";
+							jQuery('#rrsta'+i).removeClass().addClass('mnt');
+							jQuery('#rrbtn'+i).attr('disabled', 'true');
+							jQuery('#fbtn'+i).removeAttr('disabled');
+							jQuery('#mbtn'+i).attr('disabled', 'true');
+						}
+						else {
+							msg="UNKNOWN";
+							jQuery('#rrsta'+i).removeClass().addClass('unk');
+							jQuery('#rrbtn'+i).attr('disabled', 'true');
+							jQuery('#mbtn'+i).removeAttr('disabled');
+							jQuery('#fbtn'+i).attr('disabled', 'true');
+						}
+						jQuery('#rrsta'+i).html(msg);
+						i++;
+					});
+					
+				},
+        error: function(){
+					//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+//send to broker a put in maintenance request
+function maint(id){
+	//build request URL
+	var req="../api/simupdstat.php?thing="+id+"&status=3";
+	//local diagnostic of request URL
+	jQuery('#rq').html(req);
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					jQuery('#rs').html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+//send to broker a free from maintenance request
+function free(id){
+	//build request URL
+	var req="../api/simupdstat.php?thing="+id+"&status=0";
+	//local diagnostic of request URL
+	jQuery('#rq').html(req);
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					jQuery('#rs').html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+//get all info from broker and update restroom types
+//parameters: none
+function gettype() {
+	//build request URL
+	var req="../api/simgetall.php";
+	//local diagnostic of request URL
+	jQuery('#rq').html(req);
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					jQuery('#rs').html(data);
+					var things = jQuery.parseJSON( data ).data;
+					var i=1;
+					var msg="";
+					var type;
+					things.forEach(function(t){
+						type=t.type;					
+						if(type=='M'){
+							msg="MEN"
+						}
+						else if (type=='W'){
+							msg="WOMEN"
+						}
+						else if (type=='D'){
+							msg="DISABLED";
+						}
+						else if (type=='A'){
+							msg="ALL";
+						}
+						else {
+							msg="UNKNOWN";
+						}
+						jQuery('#tyid'+i).html(msg);
+						i++;
+					});
+					
+				},
+        error: function(){
+					//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+</script>
