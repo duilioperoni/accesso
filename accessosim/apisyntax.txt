@@ -1,0 +1,72 @@
+Application Program Interface (API)
+API are PHP script executed by the Apache server on an URL request from client.
+URL is defined as a web address identified by an host name follwed by a page name and may have parametric values sent as couple name/value after question mark symbol sepatated by ampersand symbol.
+http://<hostname>/folder/apiname.php?param1=value1&param2=value2
+
+Available API are:
+
+simupdsens
+Update a sensor value request: applies to a single thing and updates related sensor info; returns the  global status of the thing.
+Request: http://<hostname>/accessosim/simupdsens.php?thing=id&sensor=value
+thing: id of the related thing a 4 character unique string for each restroom
+sensor: value of sensor 0=OFF, 1=ON
+Response: see single thing response
+
+simupdsens
+Update a restroom status request: applies to a single thing and updates related status; returns the  global status of the thing.
+Request: http://<hostname>/accessosim/simupdstat.php?thing=id&status=value
+thing: id of the related thing a 4 character unique string for each restroom
+status: value of status 0=VACANT, 1=ENGAGED, 2=RESERVED, 3=MAINTENANCE
+Response: see single thing response
+
+simgetall
+Request of global status of all restrooms; applies to all thing and do not modify anything; returns the  global status of all the things.
+Request: http://<hostname>/accessosim/simgetall.php
+No parameters
+Response: see all  things response
+
+
+Single thing response
+{
+ "response":"ok | ko",
+ "data":{
+         "id":"id_code",
+		 "description":"thing_descr",
+		 "type":"M | W | A | D",
+		 "status":"0 | 1 | 2 | 3",
+		 "sensor":"0 | 1",
+		 "timestamp":"##########"}	 
+		}
+		| "faillure_desc"
+}		
+
+All things response
+{
+ "response":"ok | ko",
+ "data":[
+		 {
+          "id":"id_code_0",
+		  "description":"thing_descr_0",
+		  "type":"M | W | A | D",
+		  "status":"0 | 1 | 2 | 3",
+		  "sensor":"0 | 1",
+		  "timestamp":"##########"}	 
+		 },
+		 ...
+		 {
+          "id":"id_code_n",
+		  "description":"thing_descr_n",
+		  "type":"M | W | A | D",
+		  "status":"0 | 1 | 2 | 3",
+		  "sensor":"0 | 1",
+		  "timestamp":"##########"}	 
+		 }
+		]
+		| "failure_desc"
+}
+
+Legend:
+id_code: "B001", ... , "B999"
+description: text up to 80 chars
+type: M(en),W(omen), A(ll), D(isabled)
+timestamp: unix time of the event
