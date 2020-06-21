@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presence Sensor Simulator</title>
+<script type='text/javascript' src='../js/jquery/jquery.js?ver=1.12.4-wp'></script>
+<script type='text/javascript' src='../js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<link href="../css/site.css" rel="stylesheet">
+<link href="../css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+<div id="main">
+<h1 class="intest">Presence Sensor Simulator (Restroom)</h1>
+<hr>
+<h4>B001: SENSOR <a href="#" onclick="send('B001',1);">ON</a> | <a href="#" onclick="send('B001',0);">OFF</a> | STATUS: <b><span id="stB001">UNKN</span></b></h4>
+<h5 ><i>REQUEST:</i><span id="rqB001">?</span></h5>
+<h5><i>RESPONSE:</i><span id="rsB001">?</span></h5>
+<hr>
+<h4>B002: SENSOR <a href="#" onclick="send('B002',1);">ON</a> | <a href="#" onclick="send('B002',0);">OFF</a> | STATUS: <b><span id="stB002">UNKN</span></b></h4>
+<h5 ><i>REQUEST:</i><span id="rqB002">?</span></h5>
+<h5><i>RESPONSE:</i><span id="rsB002">?</span></h5>
+<hr>
+<h4>B003: SENSOR <a href="#" onclick="send('B003',1);">ON</a> | <a href="#" onclick="send('B003',0);">OFF</a> | STATUS: <b><span id="stB003">UNKN</span></b></h4>
+<h5 ><i>REQUEST:</i><span id="rqB003">?</span></h5>
+<h5><i>RESPONSE:</i><span id="rsB003">?</span></h5>
+<hr>
+<h4>B004: SENSORE <a href="#" onclick="send('B004',1);">ON</a> | <a href="#" onclick="send('B004',0);">OFF</a> | STATUS: <b><span id="stB004">UNKN</span></b></h4>
+<h5 ><i>REQUEST:</i><span id="rqB004">?</span></h5>
+<h5><i>RESPONSE:</i><span id="rsB004">?</span></h5>
+<hr>
+<div id="contenitore"><p class="doc">This web page simulates four microcontroller based presence sensor located in four school restroom identified by ID B001 to B004<br>
+It simulates  the status variation of the presence sensor of each restroom by means of the related ON | links OFF. <br>
+The simulator sends the request to the Message Broker and shows the sensor status, the request to the broker and the message broker's response</p></div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+    //send a request
+	function send(thing,sensor){
+		//build request URL
+		var req="../api/simupdsens.php?thing="+thing+"&sensor="+sensor;
+		//local diagnostic of request URL
+		jQuery('#rq'+thing).html(req);
+		//update local diagnostic of status
+		if(sensor==1){
+			//sensor ON (GREEN)
+			jQuery('#st'+thing).html('ON');
+			jQuery('#st'+thing).css('color','red');
+		}
+		else {
+			//sensor OFF (RED)
+			jQuery('#st'+thing).html('OFF');
+			jQuery('#st'+thing).css('color','green');
+		}
+		//send request and wait for response (sycronous)
+		jQuery.ajax({
+			url: req,
+			dataType: 'html',
+			success: function (data) {
+						//remote diagnostic of response
+						jQuery('#rs'+thing).html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+	}
+</script>
