@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="it-IT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Message Broker Simulator</title>
+<script type='text/javascript' src='../js/jquery/jquery.js?ver=1.12.4-wp'></script>
+<script type='text/javascript' src='../js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<link href="../css/site.css" rel="stylesheet">
+<link href="../css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+<div id="main">
+<h1 class="intest" >Message Broker Simulator (Database)</h1>
+<hr>
+<table class="table-bordered" width="98%">
+<tr>
+<td class="legenda" width="5%"><i><b>id</i></b></td>
+<td class="legenda" width="30%">description</td>
+<td class="legenda" width="5%">type</td>
+<td class="legenda" width="5%">status</td>
+<td class="legenda" width="5%">sensor</td>
+<td class="legenda" width="30%">timestamp</td>
+</tr>
+<tr>
+<td class="dato" ><span id="id0"></span></td>
+<td class="dato" ><span id="ds0"></span></td>
+<td class="dato" ><span id="ty0"></span></td>
+<td class="dato" ><span id="st0"></span></td>
+<td class="dato" ><span id="sn0"></span></td>
+<td class="dato" ><span id="ts0"></span></td>
+</tr>
+<tr>
+<tr>
+<td class="dato" ><span id="id1"></span></td>
+<td class="dato" ><span id="ds1"></span></td>
+<td class="dato" ><span id="ty1"></span></td>
+<td class="dato" ><span id="st1"></span></td>
+<td class="dato" ><span id="sn1"></span></td>
+<td class="dato" ><span id="ts1"></span></td>
+</tr>
+<tr>
+<td class="dato" ><span id="id2"></span></td>
+<td class="dato" ><span id="ds2"></span></td>
+<td class="dato" ><span id="ty2"></span></td>
+<td class="dato" ><span id="st2"></span></td>
+<td class="dato" ><span id="sn2"></span></td>
+<td class="dato" ><span id="ts2"></span></td>
+
+</tr>
+<tr>
+<td class="dato" ><span id="id3"></span></td>
+<td class="dato" ><span id="ds3"></span></td>
+<td class="dato" ><span id="ty3"></span></td>
+<td class="dato" ><span id="st3"></span></td>
+<td class="dato" ><span id="sn3"></span></td>
+<td class="dato" ><span id="ts3"></span></td>
+</tr>
+</table>
+<hr>
+<b>../api/simupdsens.php?thing=<select name="sensth" id="sensth">
+<option value="B001">B001</option>
+<option value="B002">B002</option>
+<option value="B003">B003</option>
+<option value="B004">B004</option>
+</select>&sensor=<select name="sensval" id="sensval">
+<option value="0">0</option>
+<option value="1">1</option>
+</select>
+<input type="button" value="Send Sensor" onClick="sendsens()"></b><br><br>
+<b>../api/simupdstat.php?thing=&nbsp;<select name="statth" id="statth">
+<option value="B001">B001</option>
+<option value="B002">B002</option>
+<option value="B003">B003</option>
+<option value="B004">B004</option>
+</select>&status=&nbsp;&nbsp;<select name="statval" id="statval">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+</select>
+<input type="button" value="Send Status" onClick="sendstat()"></b>
+<hr>
+<h5 ><i>REQUEST:</i><span id="rq">?</span></h5>
+<h5><i>RESPONSE:</i><span id="rs">?</span></h5>
+<hr>
+<div id="contenitore"><p class="doc">This web page shows the status of the four restrooms in real time as they are known by the message broker. <br>
+The changes in status and sensor are determined by the peripheral devices (microcontrolled presence sensors, smartphones) by means of the "simupdsens" and "simupdstat" APIs. <br>
+The status of the restrooms can be obtained from the message broker with the API<sup>(*)</sup> "simgetall" (all restrooms).
+Simulator can force the change of state of each restroom sending "simudpsens" and "simupdstat" API requests.<br>
+<sup>(*)</sup>API is acronym for Application Program Interface: a piece of code executed on server calling an URL</p></div>
+</div>
+</body>
+</html>
+<script type="text/javascript">
+var interval = setInterval(getall, 500);
+function getall() {
+	//build request URL
+	var req="../api/simgetall.php";
+	//local diagnostic of request URL
+	//jQuery('#rq').html(req);
+	//update local diagnostic of status
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					//jQuery('#rs').html(data);
+					var things = jQuery.parseJSON( data ).data;
+					var i=0;
+					things.forEach(function(t){
+						jQuery('#id'+i).html(t.id);
+						jQuery('#ds'+i).html(t.description);
+						jQuery('#ty'+i).html(t.type);
+						jQuery('#st'+i).html(t.status);
+						jQuery('#sn'+i).html(t.sensor);
+						jQuery('#ts'+i).html(t.timestamp);
+						i++;
+					});
+				},
+        error: function(){
+					//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+function sendsens(){
+	//build request URL
+	var thing=jQuery('#sensth option:selected').val();
+	var sensor=jQuery('#sensval option:selected').val();
+	var req="../api/simupdsens.php?thing="+thing+"&sensor="+sensor;
+	//local diagnostic of request URL
+	jQuery('#rq').html(req);
+	//update local diagnostic of status
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					jQuery('#rs').html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+function sendstat(){
+	//build request URL
+	var thing=jQuery('#statth option:selected').val();
+	var sensor=jQuery('#statval option:selected').val();
+	var req="../api/simupdstat.php?thing="+thing+"&status="+sensor;
+	//local diagnostic of request URL
+	jQuery('#rq').html(req);
+	//update local diagnostic of status
+	//send request and wait for response (sycronous)
+	jQuery.ajax({
+		url: req,
+		dataType: 'html',
+		success: function (data) {
+					//remote diagnostic of response
+					jQuery('#rs').html(data);
+                },
+                error: function(){
+						//error trap
+                    jQuery("#contenitore").html("AJAX error");
+                },
+		});
+}
+
+</script>
