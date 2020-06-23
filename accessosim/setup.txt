@@ -20,11 +20,11 @@ Launch xampp-control application and start Apache and MySQL servers
 Copy Application folder "accessosim" into Apache data directory
 Linux OS:	usually / var / www / 
 Windows OS:  <xAMPP installation path>\htdocs
-Launch the mysqladim control panel (http: // localhost / phpmyadmin
-Create a new empty database named login
+Launch the mysqladim control panel (http://localhost/phpmyadmin
+Create a new empty database named accesso
 Assign the new database to the user accessouser with password qwerty in the SQL tab
-(GRANT ALL PRIVILEGES ON access. * TO accessouser @ localhost IDENTIFIED BY qwerty)
-Import the access.sql database contained in the repository root into the Import tab of the new database.
+(GRANT ALL PRIVILEGES ON accesso. * TO accessouser@localhost IDENTIFIED BY qwerty)
+Import the accesso.sql database contained in the repository root into the Import tab of the new database.
 
 Visit address: http://localhost/accessosim
 This is home page of simulation. Home page contains:
